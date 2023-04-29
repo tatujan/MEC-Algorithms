@@ -219,43 +219,7 @@ def plot_candlestick_chart(point_counts, all_welzl_times, all_skyum_times):
 # Test
 # num_points = 100
 # points = generate_random_points(num_points, x_range=(-10, 10), y_range=(-10, 10))
-# points = [(1, 2), (2, 2), (5, 1), (3, 2), (4, 4), (4, 1)]
-
-# Measure Welzl's algorithm
-# start_time_welzl = time.time()
-# center, radius = welzl(points)
-# elapsed_time_welzl = time.time() - start_time_welzl
-# print(f"Welzl's Algorithm - Center: {center}, Radius: {radius}, Time: {elapsed_time_welzl:.6f} seconds")
-
-# Measure brute-force algorithm
-# start_time_brute = time.time()
-# center_brute, radius_brute = brute_force_min_circle(points)
-# elapsed_time_brute = time.time() - start_time_brute
-# print(f"Brute Force Algorithm - Center: {center_brute}, Radius: {radius_brute}, Time: {elapsed_time_brute:.6f} seconds")
-
-# Measure brute-force algorithm
-# start_time_skyum = time.time()
-# center_skyum, radius_skyum = skyum(points)
-# elapsed_time_skyum = time.time() - start_time_skyum
-# print(f"Skyum Algorithm - Center: {center_skyum}, Radius: {radius_skyum}, Time: {elapsed_time_skyum:.6f} seconds")
-
-
-point_counts = [5, 10, 20, 50, 100] #, 300, 400, 500]
-num_trials = 100
-
-welzl_times, skyum_times = run_tests(point_counts, num_trials)
-plot_candlestick_chart(point_counts, welzl_times, skyum_times)
-
-# plt.figure(figsize=(10, 6))
-# plt.plot(point_counts, welzl_times, marker='o', label="Welzl's Algorithm")
-# plt.plot(point_counts, brute_times, marker='s', label='Naive Brute-Force Algorithm')
-# plt.xlabel('Number of Points')
-# plt.ylabel('Average Time (seconds)')
-# plt.title('Comparison of Welzl\'s Algorithm and Naive Brute-Force Algorithm')
-# plt.legend()
-# plt.grid()
-# plt.show()
-# plt.savefig('Welzl vs Naive.png')
+points = [(1, 2), (2, 2), (5, 1), (3, 2), (4, 4), (4, 1)]
 
 # Visualization
 def plot_circle(circle, ax):
@@ -294,8 +258,10 @@ def visualize_steps(points, step_circles, save_as_gif=True):
 
     def update(num):
         ax.clear()
-        ax.set_xlim((min(points, key=lambda p: p[0])[0])*2-2, (max(points, key=lambda p: p[0])[0])*2+2)
-        ax.set_ylim((min(points, key=lambda p: p[1])[1])*2-2, (max(points, key=lambda p: p[1])[1])*2+2)
+        ax.set_xlim(-10,10)
+        ax.set_ylim(-10,10)
+        # ax.set_xlim((min(points, key=lambda p: p[0])[0])*2-2, (max(points, key=lambda p: p[0])[0])*2+2)
+        # ax.set_ylim((min(points, key=lambda p: p[1])[1])*2-2, (max(points, key=lambda p: p[1])[1])*2+2)
         ax.scatter(*zip(*points[:num+1]), color="red")
         plot_circle(step_circles[num], ax)
         plt.xlabel("X-axis")
@@ -305,7 +271,7 @@ def visualize_steps(points, step_circles, save_as_gif=True):
     ani = FuncAnimation(fig, update, frames=range(len(step_circles)), repeat=False, interval=1000)
 
     if save_as_gif:
-        ani.save('animation.gif', writer='pillow', fps=1)
+        ani.save('animation_welzl.gif', writer='pillow', fps=1)
     else:
         ani.save('animation.mp4', writer='ffmpeg', fps=1)
 
@@ -313,6 +279,6 @@ def visualize_steps(points, step_circles, save_as_gif=True):
     plt.close(fig)
 
 
-# step_circles = []
-# center, radius = welzl(points, step_circles=step_circles)
-# visualize_steps(points, step_circles, save_as_gif=True)
+step_circles = []
+center, radius = welzl(points, step_circles=step_circles)
+visualize_steps(points, step_circles, save_as_gif=True)
