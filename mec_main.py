@@ -72,13 +72,6 @@ def circle_from_support_points(points):
     # For any other case, return a default circle
     return (0, 0), 0
 
-def min_disk_with_two_points(points, q1, q2):
-    circle = circle_from_two_points(q1, q2)
-    inside_points = [p for p in points if is_point_inside_circle(circle, p)]
-    if len(inside_points) == len(points):
-        return circle
-    return None
-
 def welzl(points, step_circles=None):
     random.shuffle(points)
     circles = []
@@ -217,7 +210,7 @@ def plot_candlestick_chart(point_counts, all_welzl_times, all_skyum_times):
 
 
 point_counts = [5, 10, 20, 50, 100, 200] #, 300, 400, 500]
-num_trials = 10
+num_trials = 3
 
 welzl_times, skyum_times = run_tests(point_counts, num_trials)
 plot_candlestick_chart(point_counts, welzl_times, skyum_times)
