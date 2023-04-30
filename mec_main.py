@@ -43,16 +43,23 @@ def min_circle(points, support_points, step_circles=None):
     if step_circles is None:
         step_circles = []
 
+    # Base cases: if there are no points left to process or we have 3 support points
     if not points or len(support_points) == 3:
         circle = circle_from_support_points(support_points)
+        # Add the circle to the list of step_circles
         step_circles.append(circle)
         return circle
 
+    # Remove the last point from the list of points
     p = points.pop()
+    # Recursively call min_circle without the point p
     circle = min_circle(points, support_points, step_circles)
     if not is_point_inside_circle(circle, p):
+        # If p is outside the circle, add it to the support points
         support_points.append(p)
+        # Recursively call min_circle with the updated support_points
         circle = min_circle(points, support_points, step_circles)
+        # Remove the point p from the support points
         support_points.pop()
     points.append(p)
     return circle
@@ -74,37 +81,61 @@ def circle_from_support_points(points):
 
 def welzl(points, step_circles=None):
     random.shuffle(points)
+    # Initialize an empty list to store intermediate circles
     circles = []
+
+    # Iterate through the points from index 1 to the length of the points list
     for i in range(1, len(points) + 1):
+        # Call the min_circle function for each subset of points from the beginning up to index i
+        # with an empty list of support points
         circles.append(min_circle(points[:i], []))
+
+    # If step_circles is provided, extend it with the intermediate circles
     if step_circles is not None:
         step_circles.extend(circles)
+
+    # Return the last circle in the circles list, which is the minimum enclosing circle
     return circles[-1]
 
 def skyum(points):
     def polar_angle(p0, p1):
         return np.arctan2(p1[1] - p0[1], p1[0] - p0[0])
 
+    # Base case: if there are less than 2 points, create a circle from the support points
     if len(points) < 2:
         return circle_from_support_points(points)
 
     leftmost_point = min(points, key=lambda p: p[0])
+    # Sort the points by their polar angle with respect to the leftmost point
     sorted_points = sorted(points, key=lambda p: polar_angle(leftmost_point, p))
 
+    # Create an initial circle from the first two points in the sorted list
     circle = circle_from_two_points(sorted_points[0], sorted_points[1])
+
+    # Iterate through the sorted points starting from index 2
     for i in range(2, len(sorted_points)):
+        # Check if the current point is inside the circle
         if not is_point_inside_circle(circle, sorted_points[i]):
+            # If not, iterate through the points again up to index i
             for j in range(i):
+                # Create a new circle from the two points at indices j and i
                 circle_2 = circle_from_two_points(sorted_points[j], sorted_points[i])
+                # Check if all points up to index i are inside circle_2
                 if all(is_point_inside_circle(circle_2, p) for p in sorted_points[:i]):
+                    # If yes, update the circle to be circle_2
                     circle = circle_2
                 else:
+                    # If not, iterate through the points again up to index j
                     for k in range(j):
+                        # Create a new circle from the three points at indices k, j, and i
                         circle_3 = circle_from_three_points(sorted_points[k], sorted_points[j], sorted_points[i])
+                        # Check if all points up to index i are inside circle_3
                         if all(is_point_inside_circle(circle_3, p) for p in sorted_points[:i]):
+                            # If yes, update the circle to be circle_3 and break the loop
                             circle = circle_3
                             break
     return circle
+
 
 def brute_force_min_circle(points):
     min_circle = None
