@@ -157,69 +157,10 @@ def generate_random_points(num_points, x_range=(-10, 10), y_range=(-10, 10), dis
     return [tuple(point) for point in random_points]
 
 
-def run_tests(point_counts, num_trials):
-    distributions = ["uniform", "normal", "exponential", "poisson"]
-    all_welzl_times = {}
-    all_skyum_times = {}
-
-    for distribution in distributions:
-        welzl_times = []
-        skyum_times = []
-
-        for count in point_counts:
-            welzl_results = []
-            skyum_results = []
-
-            for _ in range(num_trials):
-                points = generate_random_points(count, distribution=distribution)
-
-                start_time = time.time()
-                _, _ = welzl(points)
-                welzl_time = time.time() - start_time
-                welzl_results.append(welzl_time)
-
-                start_time = time.time()
-                _, _ = skyum(points)
-                skyum_time = time.time() - start_time
-                skyum_results.append(skyum_time)
-
-            welzl_times.append(welzl_results)
-            skyum_times.append(skyum_results)
-
-        all_welzl_times[distribution] = welzl_times
-        all_skyum_times[distribution] = skyum_times
-
-    return all_welzl_times, all_skyum_times
-
-
-def plot_candlestick_chart(point_counts, all_welzl_times, all_skyum_times):
-    width_per_distribution = 0.6
-    positions = np.arange(len(point_counts)) * 3
-
-    for distribution in all_welzl_times:
-        welzl_times = all_welzl_times[distribution]
-        skyum_times = all_skyum_times[distribution]
-
-        fig, ax = plt.subplots(figsize=(10, 6))
-        ax.set_title(f'Comparison of Welzl\'s Algorithm and Skyum Algorithm for {distribution.capitalize()} Distribution')
-        ax.set_xlabel('Number of Points')
-        ax.set_ylabel('Execution Time (seconds)')
-
-        welzl_box = ax.boxplot(welzl_times, positions=positions - 0.6, widths=width_per_distribution, patch_artist=True, boxprops=dict(facecolor="C0"))
-        skyum_box = ax.boxplot(skyum_times, positions=positions + 0.6, widths=width_per_distribution, patch_artist=True, boxprops=dict(facecolor="C1"))
-
-        ax.legend([welzl_box['boxes'][0], skyum_box['boxes'][0]], ['Welzl\'s Algorithm', 'Skyum Algorithm'])
-        ax.set_xticks(positions)
-        ax.set_xticklabels(point_counts)
-        plt.grid()
-
-        plt.savefig(f"boxplot_welzl_vs_skyum_{distribution}.png")
-
-
 # Test
 # num_points = 100
 # points = generate_random_points(num_points, x_range=(-10, 10), y_range=(-10, 10))
-points = [(1, 2), (2, 2), (5, 1), (3, 2), (4, 4), (4, 1)]
+points = [(3, 5), (8, -2), (-5, 1), (6, -4), (5, 9), (-9, 2), (-5,3)]
 
 # Visualization
 def plot_circle(circle, ax):
@@ -229,27 +170,6 @@ def plot_circle(circle, ax):
     circle_patch = plt.Circle(center, radius, fill=False, linewidth=2)
     ax.add_patch(circle_patch)
 
-
-def visualize(points, welzl_circle, skyum_circle):
-    fig, ax = plt.subplots()
-    ax.set_xlim(-30, 30)
-    ax.set_ylim(-30, 30)
-    ax.set_aspect("equal")
-
-    # Plot the points
-    px, py = zip(*points)
-    ax.scatter(px, py, color="red")
-
-    # Plot the minimum enclosing circles
-    plot_circle(welzl_circle, ax, linestyle="-", edgecolor="blue", facecolor="none")
-    # plot_circle(skyum_circle, ax, linestyle="--", edgecolor="green", facecolor="none")
-
-    # ax.legend(["Welzl's Algorithm", "Skyum's Algorithm"], loc="upper left")
-    plt.xlabel("X-axis")
-    plt.ylabel("Y-axis")
-    plt.title("Minimum Enclosing Circle - Welzl's and Skyum's Algorithms")
-
-    plt.show()
 
 def visualize_steps(points, step_circles, save_as_gif=True):
     fig, ax = plt.subplots()
